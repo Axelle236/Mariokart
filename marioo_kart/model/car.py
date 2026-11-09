@@ -17,6 +17,9 @@ class Car:
     def accelerate(self) -> None:
         self.speed += CAR_ACCELERATION
 
+    def brake(self) -> None:
+        self.speed -= CAR_ACCELERATION
+
     def update_position(self) -> None:
         self.y += self.speed
 

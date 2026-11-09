@@ -32,6 +32,7 @@ class GameController:
                 self.quit()
 
             elif event.type == pygame.KEYDOWN:
+                print("Touche détectée:",pygame.key.name(event.key))
                 self.handle_keydown(event.key)
 
     def handle_keydown(self, key: int) -> None:
@@ -60,6 +61,9 @@ class GameController:
     def apply_input(self, car, player_input) -> None:
         if player_input['accelerate']:
             car.accelerate()
+
+        if player_input["brake"]:
+            car.brake()
 
     def render(self) -> None:
         self.view.draw(self.model)
