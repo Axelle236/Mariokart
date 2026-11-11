@@ -10,6 +10,12 @@ from controller.input_handler import InputHandler
 
 
 class GameController:
+    """
+    Contrôle le déroulement du jeu.
+
+    Gère les événements du clavier, les actions du joueur,
+    la mise à jour du modèle et l'affichage.
+    """
 
     def __init__(self):
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -27,6 +33,13 @@ class GameController:
             self.clock.tick(FPS)
 
     def handle_events(self) -> None:
+        """
+        Traite les événements reçus par Pygame.
+
+        Ferme le jeu si l'utilisateur quitte la fenêtre
+        et transmet les touches pressées à handle_keydown().
+        """
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
@@ -50,6 +63,14 @@ class GameController:
             self.quit()
 
     def update(self) -> None:
+        """
+        Met à jour les données du jeu pendant la course.
+        
+        Vérifie que la course est en cours et qu'un
+        circuit est chargé avant de déplacer la voiture.
+        
+        """
+
         if self.model.state != GameState.RACING:
             return
 
@@ -59,6 +80,16 @@ class GameController:
         self.model.update()
 
     def apply_input(self, car, player_input) -> None:
+        """
+        Applique les commandes du joueur à sa voiture.
+
+        Paramètres :
+        car : voiture à contrôler.
+        player_input : dictionnaire contenant les actions
+        du joueur (accélérer ou freiner).
+
+        """
+        
         if player_input['accelerate']:
             car.accelerate()
 
@@ -66,6 +97,12 @@ class GameController:
             car.brake()
 
     def render(self) -> None:
+        """
+        Actualise l'affichage du jeu.
+
+        Transmet le modèle à la vue pour dessiner
+        les éléments correspondant à l'état actuel.
+        """
         self.view.draw(self.model)
 
     def quit(self) -> None:

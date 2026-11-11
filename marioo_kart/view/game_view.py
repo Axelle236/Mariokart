@@ -8,12 +8,32 @@ from model.game_model import GameModel
 
 
 class GameView:
+    """
+    Gère l'affichage graphique du jeu.
+
+    Dessine le menu, le circuit et la voiture
+    selon les données fournies par le modèle.
+    """
 
     def __init__(self, screen: pygame.Surface):
+        """
+        Initialise la vue du jeu.
+
+        Paramètre :
+            screen : surface Pygame utilisée pour l'affichage.
+        """
+        
         self.screen = screen
         self.font = pygame.font.SysFont("Arial", 24)
 
     def draw(self, model: GameModel) -> None:
+        """
+        Affiche le jeu selon son état actuel.
+        
+        Dessine le menu ou la course à partir du modèle,
+        puis actualise l'écran.
+        """
+         
         self.screen.fill(COLOR_BG)
         if model.state == GameState.MENU:
             self._draw_menu(model)
@@ -22,6 +42,13 @@ class GameView:
         pygame.display.flip()
 
     def _draw_menu(self, model: GameModel) -> None:
+        """
+        Dessine le menu principal du jeu.
+
+        Affiche le titre et les options permettant
+        de commencer une course ou de quitter.
+        """
+
         cx = WINDOW_WIDTH // 2
 
         title_surf = self.font.render(
@@ -42,13 +69,22 @@ class GameView:
 
     def _draw_racing(self, model: GameModel) -> None:
 
+        """
+        Dessine les éléments visibles pendant une course.
+
+        Affiche les cases du circuit et la voiture
+        à partir des données du modèle.
+        """
+
+        if model.circuit is None:
+            return
+
         for row_idx, row in enumerate(model.circuit.grid):
             for col_idx, tile in enumerate(row):
                 sprite = tile.get_sprite(TILE_SIZE)
                 self.screen.blit(
                     sprite, (col_idx * TILE_SIZE, row_idx * TILE_SIZE))
 
-        if model.circuit is None:
-            return
+        
         surf, rect = model.car.get_rotated_sprite()
         self.screen.blit(surf, rect)

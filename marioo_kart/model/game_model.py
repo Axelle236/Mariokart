@@ -5,6 +5,12 @@ from model.road_tile import RoadTile
 
 
 class GameModel:
+    """
+    Contient les données et l'état du jeu.
+
+    Gère le circuit, la voiture et leur évolution
+    pendant une course.
+    """
 
     def __init__(self):
         self.state: str = GameState.MENU
