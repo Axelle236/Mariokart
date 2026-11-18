@@ -78,16 +78,14 @@ class GameView:
         à partir des données du modèle.
         """
 
-        if model.circuit is None or model.car is None:
-            return
-
         for row_idx, row in enumerate(model.circuit.grid):
             for col_idx, tile in enumerate(row):
-                sprite = tile.get_sprite(TILE_SIZE)
+                sprite = self._tile_surface
                 self.screen.blit(
                     sprite, (col_idx * TILE_SIZE, row_idx * TILE_SIZE))
-
         
+        if model.circuit is None or model.car is None:
+            return
         car=model.car
         rotated=pygame.transform.rotate(self._car_surface, -car.angle)
         rect=rotated.get_rect(center=(int(car.x), int(car.y)))
@@ -97,3 +95,8 @@ class GameView:
         surf=pygame.Surface((CAR_WIDTH, CAR_HEIGHT), pygame.SRCALPHA)
         pygame.draw.rect(surf, (255, 0, 0), surf.get_rect(), border_radius=5)
         return surf
+    def _build_tile_surface(self)-> pygame.Surface:
+        surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
+        surface.fill((80, 80, 90))
+        pygame.draw.rect(surface, (60, 60, 70), surface.get_rect(), 2)
+        return surface

@@ -45,7 +45,6 @@ class GameController:
                 self.quit()
 
             elif event.type == pygame.KEYDOWN:
-                print("Touche détectée:",pygame.key.name(event.key))
                 self.handle_keydown(event.key)
 
     def handle_keydown(self, key: int) -> None:
@@ -75,8 +74,7 @@ class GameController:
             return
 
         p1_input = self.input_handler.get_inputs()
-        car = self.model.car
-        self.apply_input(car, p1_input)
+        self.model.handle_player_input(p1_input)
         self.model.update()
 
     def render(self) -> None:
