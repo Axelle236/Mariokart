@@ -79,23 +79,6 @@ class GameController:
         self.apply_input(car, p1_input)
         self.model.update()
 
-    def apply_input(self, car, player_input) -> None:
-        """
-        Applique les commandes du joueur à sa voiture.
-
-        Paramètres :
-        car : voiture à contrôler.
-        player_input : dictionnaire contenant les actions
-        du joueur (accélérer ou freiner).
-
-        """
-        
-        if player_input['accelerate']:
-            car.accelerate()
-
-        if player_input["brake"]:
-            car.brake()
-
     def render(self) -> None:
         """
         Actualise l'affichage du jeu.

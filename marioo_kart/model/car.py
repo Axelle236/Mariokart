@@ -18,7 +18,6 @@ class Car:
         self.y = start_row * TILE_SIZE + TILE_SIZE // 2
         self.speed: float = 0.0
         self.angle: float = 0.0
-        self.sprite = self.build_sprite()
 
     def accelerate(self) -> None:
         """
@@ -40,21 +39,3 @@ class Car:
         """
         
         self.y += self.speed
-
-    def build_sprite(self) -> pygame.Surface:
-        surf = pygame.Surface((CAR_WIDTH, CAR_HEIGHT), pygame.SRCALPHA)
-        pygame.draw.rect(surf, (255, 0, 0), (0, 0, CAR_WIDTH,
-                         CAR_HEIGHT), border_radius=5)
-        return surf
-
-    def get_rotated_sprite(self) -> tuple[pygame.Surface, pygame.Rect]:
-        """
-        Récupère l'image de la voiture selon son orientation.
-
-        Retourne la surface tournée et son rectangle
-        centré sur la position actuelle de la voiture.
-        """
-        
-        rotated = pygame.transform.rotate(self.sprite, -self.angle)
-        rect = rotated.get_rect(center=(int(self.x), int(self.y)))
-        return rotated, rect

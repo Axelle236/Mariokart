@@ -1,6 +1,6 @@
 import pygame
 from constants import (
-    WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE,
+    WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE, CAR_WIDTH, CAR_HEIGHT,
     COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER,
     GameState
 )
@@ -25,6 +25,8 @@ class GameView:
         
         self.screen = screen
         self.font = pygame.font.SysFont("Arial", 24)
+        self._tile_surface=self._build_tile_surface()
+        self._car_surface=self._build_car_surface()
 
     def draw(self, model: GameModel) -> None:
         """
@@ -76,7 +78,7 @@ class GameView:
         à partir des données du modèle.
         """
 
-        if model.circuit is None:
+        if model.circuit is None or model.car is None:
             return
 
         for row_idx, row in enumerate(model.circuit.grid):
@@ -86,5 +88,12 @@ class GameView:
                     sprite, (col_idx * TILE_SIZE, row_idx * TILE_SIZE))
 
         
-        surf, rect = model.car.get_rotated_sprite()
-        self.screen.blit(surf, rect)
+        car=model.car
+        rotated=pygame.transform.rotate(self._car_surface, -car.angle)
+        rect=rotated.get_rect(center=(int(car.x), int(car.y)))
+        self.screen.blit(rotated, rect)
+
+    def _build_car_surface(self) -> pygame.Surface:
+        surf=pygame.Surface((CAR_WIDTH, CAR_HEIGHT), pygame.SRCALPHA)
+        pygame.draw.rect(surf, (255, 0, 0), surf.get_rect(), border_radius=5)
+        return surf

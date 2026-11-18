@@ -30,3 +30,13 @@ class GameModel:
         if self.state != GameState.RACING or self.circuit is None:
             return
         self.car.update_position()
+
+    def start_race(self) -> None:
+        self.load_circuit()
+        self.state=GameState.RACING
+
+    def handle_player_input(self, player_input: dict) -> None:
+        if self.car is None:
+            return
+        if player_input['accelerate']:
+            self.car.accelerate()
