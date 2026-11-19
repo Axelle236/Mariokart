@@ -1,36 +1,50 @@
 import pygame
 
 
-MAPPING = {
-    pygame.K_UP:     "accelerate",
+MAPPING_P1 = {
+    pygame.K_z: "accelerate",
+    pygame.K_w: "accelerate",
+    pygame.K_s: "brake",
+    pygame.K_q: "left",
+    pygame.K_a: "left",
+    pygame.K_d: "right",
+}
+
+MAPPING_P2 = {
+    pygame.K_UP: "accelerate",
     pygame.K_DOWN: "brake",
+    pygame.K_LEFT: "left",
+    pygame.K_RIGHT: "right",
 }
 
 
 class InputHandler:
     """
-    Gère les commandes du joueur au clavier.
-
-    Associe les touches aux actions du jeu et indique
-    quelles commandes sont actuellement activées.
+    Gère les commandes des deux joueurs au clavier.
     """
 
+
     def __init__(self):
-        self.mapping = MAPPING
+        self.mapping_p1 = MAPPING_P1
+        self.mapping_p2 = MAPPING_P2
+        
 
-    def get_inputs(self) -> dict:
+    def get_inputs(self) -> tuple[dict, dict]:
         """
-        Récupère les commandes actuellement activées au clavier.
-
-        Retourne un dictionnaire associant chaque action
-        à un booléen indiquant si sa touche est enfoncée.
+        Retourne les actions activées pour chaque joueur.
         """
-
         keys = pygame.key.get_pressed()
-        p = {action: False for action in self.mapping.values()}
 
-        for key, action in self.mapping.items():
-            if keys[key]:
-                p[action] = True
+        def read_mapping(mapping):
+            actions = {action: False for action in mapping.values()}
 
-        return p
+            for key, action in mapping.items():
+                if keys[key]:
+                    actions[action] = True
+
+            return actions
+
+        p1 = read_mapping(self.mapping_p1)
+        p2 = read_mapping(self.mapping_p2)
+
+        return p1, p2

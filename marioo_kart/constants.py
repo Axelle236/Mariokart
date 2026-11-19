@@ -1,22 +1,46 @@
+
+# --- Paramètres de la fenêtre ---
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 768
 FPS = 60
 
+# --- Dimensions du circuit ---
 TILE_SIZE = 64
 GRID_COLS = 16
 GRID_ROWS = 12
 
+# --- Paramètres de déplacement ---
 CAR_ACCELERATION = 0.05
+CAR_TURN_SPEED = 3
+
+# --- Dimensions des voitures ---
 CAR_WIDTH = 30
 CAR_HEIGHT = 50
 
+CAR_GRIP = 0.08
 
+CAR_MAX_SPEED = 6.0
+CAR_MAX_REVERSE_SPEED = 2.0
+CAR_FRICTION = 0.02
+
+# --- Adhérence selon le terrain ---
+TERRAIN_GRIP = {
+    "road": 0.15,
+    "dirt": 0.08,
+    "grass": 0.04,
+    "ice": 0.01,
+    "sand": 0.06
+}
+
+
+# --- États du jeu ---
 class GameState:
     MENU = "menu"
+    CIRCUIT_SELECTION = "circuit_selection"
     RACING = "racing"
 
 
-# --- Couleurs UI ---
+# --- Couleurs de l'interface ---
 COLOR_BG = (15, 15, 25)
 COLOR_TEXT = (240, 240, 240)
 COLOR_ACCENT = (255, 200, 0)
