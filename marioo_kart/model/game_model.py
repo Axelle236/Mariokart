@@ -1,3 +1,5 @@
+# Kart-Engine v2.3
+
 from constants import GameState, GRID_ROWS, GRID_COLS
 from model.car import Car
 from model.circuit import Circuit
@@ -8,17 +10,19 @@ class GameModel:
     """
     Contient les données et l'état du jeu.
 
-    Gère le circuit, la voiture et leur évolution
+    Gère le circuit, les deux voitures et leur évolution
     pendant une course.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        Initialise les données du jeu.
+        """
         self.state: str = GameState.MENU
         self.circuit: Circuit | None = None
         self.car1: Car | None = None
         self.car2: Car | None = None
 
-    
     def load_circuit(self) -> None:
         """
         Génère la grille du circuit et initialise les voitures.
@@ -34,7 +38,6 @@ class GameModel:
         self.circuit = Circuit(grid=grid)
         self.spawn_car()
 
-
     def spawn_car(self) -> None:
         """
         Place les deux voitures sur leurs cases de départ.
@@ -42,11 +45,59 @@ class GameModel:
         self.car1 = Car(7, 1, (255, 0, 0))
         self.car2 = Car(8, 1, (0, 0, 255))
 
+    def start_race(self) -> None:
+        """
+        Charge le circuit et démarre la course.
+        """
+        self.load_circuit()
+        self.state = GameState.RACING
+
+    def handle_player_input(
+        self,
+        car: Car | None,
+        player_input: dict[str, bool]
+    ) -> None:
+        """
+        Applique les commandes d'un joueur à sa voiture.
+        """
+        if car is None:
+            return
+
+        if player_input["accelerate"]:
+            car.accelerate()
+
+        if player_input["brake"]:
+            car.brake()
+
+        if not player_input["accelerate"] and not player_input["brake"]:
+            car.decelerate()
+
+        if player_input["left"]:
+            car.turn_left()
+
+        if player_input["right"]:
+            car.turn_right()
+
+    def update_car_terrain(self, car: Car) -> None:
+        """
+        Adapte l'adhérence de la voiture au terrain.
+        """
+        if self.circuit is None:
+            return
+
+        tile = self.circuit.get_tile_at_pixel(
+            car.x, car.y
+        )
+
+        if tile is not None:
+            terrain = getattr(tile, "terrain", "road")
+            car.set_terrain(terrain)
+
     def update(self) -> None:
         """
         Met à jour les deux voitures pendant la course.
 
-        Adapte leur adhérence, actualise leur position
+        Adapte leur adhérence, calcule leur déplacement
         et vérifie les limites du circuit.
         """
         if self.state != GameState.RACING or self.circuit is None:
@@ -58,22 +109,6 @@ class GameModel:
                 car.update_position()
 
                 car.check_boundaries(
-                self.circuit.pixel_width(),
-                self.circuit.pixel_height())
-
-    def update_car_terrain(self, car: Car) -> None:
-        """
-        Adapte l'adhérence de la voiture
-        au terrain sur lequel elle se trouve.
-        """
-        
-        if self.circuit is None:
-            return
-
-        tile = self.circuit.get_tile_at_pixel(
-            car.x, car.y
-        )
-
-        if tile is not None:
-            terrain = getattr(tile, "terrain", "road")
-            car.set_terrain(terrain)
+                    self.circuit.pixel_width(),
+                    self.circuit.pixel_height()
+                )

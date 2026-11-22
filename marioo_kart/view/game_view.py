@@ -1,3 +1,4 @@
+
 # Kart-Engine v2.3
 
 import pygame
@@ -5,6 +6,8 @@ import pygame
 from constants import (
     WINDOW_WIDTH,
     TILE_SIZE,
+    CAR_WIDTH,
+    CAR_HEIGHT,
     COLOR_BG,
     COLOR_TEXT,
     COLOR_ACCENT,
@@ -14,6 +17,7 @@ from constants import (
 )
 
 from model.game_model import GameModel
+from model.car import Car
 
 
 class GameView:
@@ -21,25 +25,25 @@ class GameView:
     Gère l'affichage graphique du jeu.
 
     Dessine le menu, le circuit et les deux voitures
-    selon les données fournies par le modèle.
+    à partir des données du modèle.
     """
 
     def __init__(self, screen: pygame.Surface) -> None:
         """
-        Initialise la vue du jeu.
-
-        Paramètre :
-            screen : surface Pygame utilisée pour l'affichage.
+        Initialise les éléments graphiques.
         """
         self.screen = screen
         self.font = pygame.font.SysFont("Arial", 24)
 
+        # Création de la surface du circuit
+        self._tile_surface = self._build_tile_surface()
+
+        # Cache des sprites des voitures selon leur couleur
+        self._car_surfaces = {}
+
     def draw(self, model: GameModel) -> None:
         """
         Affiche le jeu selon son état actuel.
-
-        Dessine le menu ou la course à partir du modèle,
-        puis actualise l'écran.
         """
         self.screen.fill(COLOR_BG)
 
@@ -53,10 +57,7 @@ class GameView:
 
     def _draw_menu(self, model: GameModel) -> None:
         """
-        Dessine le menu principal du jeu.
-
-        Affiche le titre et les options permettant
-        de commencer une course ou de quitter.
+        Dessine le menu principal.
         """
         cx = WINDOW_WIDTH // 2
 
@@ -80,13 +81,18 @@ class GameView:
             rect = pygame.Rect(cx - 140, y - 25, 280, 50)
 
             pygame.draw.rect(
-                self.screen, COLOR_PANEL,
-                rect, border_radius=8
+                self.screen,
+                COLOR_PANEL,
+                rect,
+                border_radius=8
             )
 
             pygame.draw.rect(
-                self.screen, COLOR_PANEL_BORDER,
-                rect, 2, border_radius=8
+                self.screen,
+                COLOR_PANEL_BORDER,
+                rect,
+                2,
+                border_radius=8
             )
 
             text_surf = self.font.render(
@@ -102,26 +108,89 @@ class GameView:
 
     def _draw_racing(self, model: GameModel) -> None:
         """
-        Dessine les éléments visibles pendant une course.
-
-        Affiche les cases du circuit et les deux voitures
-        à partir des données du modèle.
+        Dessine le circuit et les deux voitures.
         """
         if model.circuit is None:
             return
 
-        # Affichage du circuit
+        # Affichage des cases du circuit
         for row_idx, row in enumerate(model.circuit.grid):
             for col_idx, tile in enumerate(row):
-                sprite = tile.get_sprite(TILE_SIZE)
 
                 self.screen.blit(
-                    sprite,
+                    self._tile_surface,
                     (col_idx * TILE_SIZE, row_idx * TILE_SIZE)
                 )
 
         # Affichage des deux voitures
         for car in (model.car1, model.car2):
             if car is not None:
-                surf, rect = car.get_rotated_sprite()
-                self.screen.blit(surf, rect)
+                self._draw_car(car)
+
+    def _draw_car(self, car: Car) -> None:
+        """
+        Dessine une voiture avec sa couleur
+        et son orientation.
+        """
+        color = car.color
+
+        # Créer le sprite uniquement si nécessaire
+        if color not in self._car_surfaces:
+            self._car_surfaces[color] = (
+                self._build_car_surface(color)
+            )
+
+        sprite = self._car_surfaces[color]
+
+        # Rotation selon l'orientation
+        rotated = pygame.transform.rotate(
+            sprite, -car.angle
+        )
+
+        # Centrage sur la position de la voiture
+        rect = rotated.get_rect(
+            center=(int(car.x), int(car.y))
+        )
+
+        self.screen.blit(rotated, rect)
+
+    def _build_car_surface(
+        self,
+        color: tuple[int, int, int]
+    ) -> pygame.Surface:
+        """
+        Crée le sprite rectangulaire d'une voiture.
+        """
+        surf = pygame.Surface(
+            (CAR_WIDTH, CAR_HEIGHT),
+            pygame.SRCALPHA
+        )
+
+        pygame.draw.rect(
+            surf,
+            color,
+            surf.get_rect(),
+            border_radius=5
+        )
+
+        return surf
+
+    def _build_tile_surface(self) -> pygame.Surface:
+        """
+        Crée la représentation graphique
+        d'une case du circuit.
+        """
+        surface = pygame.Surface(
+            (TILE_SIZE, TILE_SIZE)
+        )
+
+        surface.fill((80, 80, 90))
+
+        pygame.draw.rect(
+            surface,
+            (60, 60, 70),
+            surface.get_rect(),
+            2
+        )
+
+        return surface

@@ -1,6 +1,5 @@
 # Kart-Engine v2.3
 
-import pygame
 import math
 
 from constants import (
@@ -21,8 +20,8 @@ class Car:
     """
     Représente une voiture du jeu.
 
-    Gère sa position, sa vitesse, son orientation,
-    son adhérence et son apparence graphique.
+    Gère sa position, sa vitesse, son orientation
+    et son adhérence.
     """
 
     def __init__(
@@ -30,7 +29,7 @@ class Car:
         start_col: int,
         start_row: int,
         color: tuple[int, int, int] = (255, 0, 0)
-    ):
+    ) -> None:
         """
         Initialise la voiture au centre de sa case de départ.
         """
@@ -42,7 +41,6 @@ class Car:
         self.vy: float = 0.0
         self.grip: float = CAR_GRIP
         self.color = color
-        self.sprite = self.build_sprite()
 
     def accelerate(self) -> None:
         """
@@ -138,37 +136,3 @@ class Car:
             self.y = height - margin
             self.vy = 0.0
             self.speed = 0.0
-
-    def build_sprite(self) -> pygame.Surface:
-        """
-        Crée la représentation graphique de la voiture
-        sous la forme d'un rectangle coloré.
-        """
-        surf = pygame.Surface(
-            (CAR_WIDTH, CAR_HEIGHT),
-            pygame.SRCALPHA
-        )
-
-        pygame.draw.rect(
-            surf,
-            self.color,
-            (0, 0, CAR_WIDTH, CAR_HEIGHT),
-            border_radius=5
-        )
-
-        return surf
-
-    def get_rotated_sprite(self) -> tuple[pygame.Surface, pygame.Rect]:
-        """
-        Retourne la surface tournée et son rectangle
-        centré sur la position actuelle de la voiture.
-        """
-        rotated = pygame.transform.rotate(
-            self.sprite, -self.angle
-        )
-
-        rect = rotated.get_rect(
-            center=(int(self.x), int(self.y))
-        )
-
-        return rotated, rect
