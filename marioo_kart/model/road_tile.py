@@ -10,7 +10,8 @@ class RoadTile:
     pour représenter cette case.
     """
 
-    def __init__(self, col: int, row: int):
+    def __init__(self, col: int, row: int, kind: str):
         self.col = col
         self.row = row
-        self.sprite: pygame.Surface | None = None
+        self.kind=kind
+        

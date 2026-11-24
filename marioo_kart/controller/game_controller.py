@@ -1,5 +1,4 @@
 import pygame
-import sys
 from constants import (
     WINDOW_WIDTH, WINDOW_HEIGHT, FPS,
     GameState
@@ -43,23 +42,33 @@ class GameController:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
-
             elif event.type == pygame.KEYDOWN:
                 self.handle_keydown(event.key)
 
     def handle_keydown(self, key: int) -> None:
-
         state = self.model.state
-
         if state == GameState.MENU:
             self.handle_menu_key(key)
+        elif state==GameState.CIRCUIT_SELECT:
+            self.handle_circuit_select_key(key)
+        elif state==GameState.RACING and key==pygame.K_ESCAPE:
+            self.model.state=GameState.MENU
 
     def handle_menu_key(self, key: int) -> None:
         if key == pygame.K_RETURN:
-            self.model.load_circuit()
-            self.model.state = GameState.RACING
+            self.model.state = GameState.CIRCUIT_SELECT
         elif key == pygame.K_ESCAPE:
             self.quit()
+
+    def handle_circuit_select_key(self, key: int) -> None:
+        if key == pygame.K_UP:
+            self.model.select_previous_circuit()
+        elif key == pygame.K_DOWN:
+            self.model.select_next_circuit()
+        elif key == pygame.K_RETURN:
+            self.model.start_race()
+        elif key == pygame.K_ESCAPE:
+            self.model.state = GameState.MENU
 
     def update(self) -> None:
         """
@@ -88,5 +97,3 @@ class GameController:
 
     def quit(self) -> None:
         self.running = False
-        pygame.quit()
-        sys.exit()

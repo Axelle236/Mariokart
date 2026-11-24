@@ -1,14 +1,25 @@
 from model.road_tile import RoadTile
-from constants import TILE_SIZE
+from constants import TILE_SIZE, TILE_KINDS
 
 
 class Circuit:
 
-    def __init__(self,  grid: list[list[RoadTile]]):
-        self.grid = grid
-        self.rows = len(grid)
-        self.cols = len(grid[0]) if grid else 0
-
+    def __init__(self, name:str, terrain_rows: list[str]):
+        self.name=name
+        width = len(terrain_rows[0])
+        for line in terrain_rows:
+            if len(line) != width:
+                raise ValueError(f"'{name}' : toutes les lignes doivent avoir {width} caractères")
+            
+        self.grid = []
+        for row, line in enumerate(terrain_rows):
+            grid_row = []
+            for col, char in enumerate(line):
+                grid_row.append(RoadTile(col=col, row=row, kind=TILE_KINDS[char]))
+            self.grid.append(grid_row) 
+        self.rows = len(self.grid)
+        self.cols = width
+        
     def get_tile(self, col: int, row: int) -> RoadTile | None:
         if 0 <= row < self.rows and 0 <= col < self.cols:
             return self.grid[row][col]
