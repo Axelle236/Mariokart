@@ -36,7 +36,10 @@ class GameView:
         self.font = pygame.font.SysFont("Arial", 24)
 
         # Création de la surface du circuit
-        self._tile_surface = self._build_tile_surface()
+        self._tile_surfaces = {
+            terrain: self._build_tile_surface(terrain)
+            for terrain in ("road", "grass", "dirt", "ice")
+}
 
         # Cache des sprites des voitures selon leur couleur
         self._car_surfaces = {}
@@ -117,8 +120,10 @@ class GameView:
         for row_idx, row in enumerate(model.circuit.grid):
             for col_idx, tile in enumerate(row):
 
+                surface = self._tile_surfaces[tile.terrain]
+
                 self.screen.blit(
-                    self._tile_surface,
+                    surface,
                     (col_idx * TILE_SIZE, row_idx * TILE_SIZE)
                 )
 
@@ -175,16 +180,22 @@ class GameView:
 
         return surf
 
-    def _build_tile_surface(self) -> pygame.Surface:
+    def _build_tile_surface(self, terrain: str) -> pygame.Surface:
         """
-        Crée la représentation graphique
-        d'une case du circuit.
+        Crée une case graphique selon le type de terrain.
         """
-        surface = pygame.Surface(
-            (TILE_SIZE, TILE_SIZE)
-        )
 
-        surface.fill((80, 80, 90))
+        couleurs = {
+            "road": (80, 80, 90),
+            "grass": (60, 150, 70),
+            "dirt": (160, 110, 65),
+            "ice": (140, 210, 240)
+        }
+
+        surface = pygame.Surface((TILE_SIZE, TILE_SIZE))
+
+        couleur = couleurs.get(terrain, (80, 80, 90))
+        surface.fill(couleur)
 
         pygame.draw.rect(
             surface,

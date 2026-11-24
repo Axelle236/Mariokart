@@ -27,13 +27,29 @@ class GameModel:
         """
         Génère la grille du circuit et initialise les voitures.
         """
-        grid = [
-            [
-                RoadTile(col=col_idx, row=row_idx)
-                for col_idx in range(GRID_COLS)
-            ]
-            for row_idx in range(GRID_ROWS)
-        ]
+
+        grid = []
+
+        for row in range(GRID_ROWS):
+            ligne = []
+
+            for col in range(GRID_COLS):
+
+                terrain = "road"
+
+                if row < 2 or row > 9 or col < 2 or col > 13:
+                    terrain = "grass"
+
+                elif 4 <= row <= 6 and 5 <= col <= 9:
+                    terrain = "ice"
+
+                elif 7 <= row <= 8 and 4 <= col <= 11:
+                    terrain = "dirt"
+
+                case = RoadTile(col, row, terrain)
+                ligne.append(case)
+
+            grid.append(ligne)
 
         self.circuit = Circuit(grid=grid)
         self.spawn_car()
@@ -53,15 +69,19 @@ class GameModel:
         self.state = GameState.RACING
 
     def handle_player_input(
-        self,
-        car: Car | None,
-        player_input: dict[str, bool]
-    ) -> None:
+    self,
+    car: Car | None,
+    player_input: dict[str, bool]
+) -> None:
         """
-        Applique les commandes d'un joueur à sa voiture.
+        Actualise les caractéristiques du terrain et
+        applique les commandes d'un joueur à sa voiture.
         """
         if car is None:
             return
+
+        # Actualisation du terrain
+        self.update_car_terrain(car)
 
         if player_input["accelerate"]:
             car.accelerate()
@@ -105,7 +125,6 @@ class GameModel:
 
         for car in (self.car1, self.car2):
             if car is not None:
-                self.update_car_terrain(car)
                 car.update_position()
 
                 car.check_boundaries(

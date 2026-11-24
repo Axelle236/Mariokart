@@ -12,9 +12,14 @@ from constants import (
     CAR_MAX_SPEED,
     CAR_MAX_REVERSE_SPEED,
     CAR_FRICTION,
-    TERRAIN_GRIP
+    TERRAIN_GRIP,
+    TERRAIN_TRACTION,
+    TERRAIN_FRICTION,
+    AIR_FRICTION,
+    DRIFT_ANGLE_THRESHOLD,
+    TERRAIN_DRIFT_FRICTION
 )
-
+GRIP_SCALE = 0.87
 
 class Car:
     """
@@ -40,17 +45,16 @@ class Car:
         self.vx: float = 0.0
         self.vy: float = 0.0
         self.grip: float = CAR_GRIP
+        self.traction: float = 1.0
+        self.friction: float = CAR_FRICTION
+        self.drift_friction: float = TERRAIN_DRIFT_FRICTION["road"]
         self.color = color
 
     def accelerate(self) -> None:
-        """
-        Augmente la vitesse sans dépasser
-        la vitesse maximale autorisée.
-        """
         self.speed = min(
-            self.speed + CAR_ACCELERATION,
-            CAR_MAX_SPEED
-        )
+        self.speed + CAR_ACCELERATION * self.traction,
+        CAR_MAX_SPEED
+    )
 
     def brake(self) -> None:
         """
@@ -58,7 +62,7 @@ class Car:
         la vitesse en marche arrière.
         """
         self.speed = max(
-            self.speed - CAR_ACCELERATION,
+            self.speed - CAR_ACCELERATION * self.traction,
             -CAR_MAX_REVERSE_SPEED
         )
 
@@ -67,7 +71,7 @@ class Car:
         Réduit progressivement la vitesse
         en l'absence d'accélération et de freinage.
         """
-        self.speed *= (1 - CAR_FRICTION)
+        self.speed *= (1 - self.friction)
 
         if abs(self.speed) < 0.01:
             self.speed = 0.0
@@ -86,10 +90,62 @@ class Car:
 
     def set_terrain(self, terrain: str) -> None:
         """
-        Adapte l'adhérence de la voiture
-        en fonction du terrain.
+        Adapte l'adhérence et la traction au terrain.
         """
-        self.grip = TERRAIN_GRIP.get(terrain, CAR_GRIP)
+        self.grip = TERRAIN_GRIP.get(terrain, CAR_GRIP) * GRIP_SCALE
+
+        self.traction = TERRAIN_TRACTION.get(terrain, 1.0)
+
+        self.friction = TERRAIN_FRICTION.get(terrain, CAR_FRICTION)
+
+        self.drift_friction = TERRAIN_DRIFT_FRICTION.get(
+            terrain, TERRAIN_DRIFT_FRICTION["road"]
+        )
+
+    def get_drift_angle(self) -> float:
+        """
+        Calcule l'angle de dérapage de la voiture
+        en marche avant et en marche arrière.
+        """
+
+        if math.hypot(self.vx, self.vy) < 0.01:
+            return 0.0
+
+        direction = math.degrees(
+            math.atan2(self.vx, -self.vy)
+        )
+
+        orientation = self.angle
+
+        if self.speed < 0:
+            orientation += 180
+
+        ecart = (direction - orientation + 180) % 360 - 180
+
+        return abs(ecart)
+
+    def apply_drift_friction(self) -> None:
+        """
+        Applique des frottements supplémentaires
+        lorsque la voiture dérape.
+        """
+        drift_angle = self.get_drift_angle()
+
+        if drift_angle > DRIFT_ANGLE_THRESHOLD:
+
+            facteur = 1 - self.drift_friction
+
+            self.speed *= facteur
+            self.vx *= facteur
+            self.vy *= facteur
+
+    def apply_air_friction(self) -> None:
+        """
+        Applique les frottements de l'air.
+        """
+        self.speed *= (1 - AIR_FRICTION)
+        self.vx *= (1 - AIR_FRICTION)
+        self.vy *= (1 - AIR_FRICTION)
 
     def update_position(self) -> None:
         """
@@ -106,6 +162,10 @@ class Car:
         # Transition progressive vers cette direction
         self.vx += (target_vx - self.vx) * self.grip
         self.vy += (target_vy - self.vy) * self.grip
+
+        # Application des frottements
+        self.apply_drift_friction()
+        self.apply_air_friction()
 
         # Mise à jour de la position
         self.x += self.vx

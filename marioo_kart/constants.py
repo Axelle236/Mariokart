@@ -32,6 +32,30 @@ TERRAIN_GRIP = {
     "sand": 0.06
 }
 
+TERRAIN_TRACTION = {
+    "road": 1.0,
+    "grass": 0.6,
+    "dirt": 0.7,
+    "ice": 0.2
+}
+
+TERRAIN_FRICTION = {
+    "road": 0.02,
+    "grass": 0.05,
+    "dirt": 0.04,
+    "ice": 0.005
+}
+
+AIR_FRICTION = 0.001
+
+DRIFT_ANGLE_THRESHOLD = 15.0
+
+TERRAIN_DRIFT_FRICTION = {
+    "road": 0.04,
+    "grass": 0.02,
+    "dirt": 0.01,
+    "ice": 0.002
+}
 
 # --- États du jeu ---
 class GameState:

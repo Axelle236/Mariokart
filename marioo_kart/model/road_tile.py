@@ -6,11 +6,16 @@ class RoadTile:
     """
     Représente une case du circuit.
 
-    Fournit les informations et l'image nécessaires
-    pour représenter cette case.
+    Chaque case possède une position et un type de terrain.
     """
 
-    def __init__(self, col: int, row: int):
+    def __init__(
+        self,
+        col: int,
+        row: int,
+        terrain: str = "road"
+    ) -> None:
+
         self.col = col
         self.row = row
-        self.sprite: pygame.Surface | None = None
+        self.terrain = terrain
