@@ -10,8 +10,9 @@ class RoadTile:
     pour représenter cette case.
     """
 
-    def __init__(self, col: int, row: int, kind: str):
+    def __init__(self, col: int, row: int, kind: str, block: int):
         self.col = col
         self.row = row
         self.kind=kind
+        self.block=block
         

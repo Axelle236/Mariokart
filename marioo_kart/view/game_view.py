@@ -1,11 +1,13 @@
 import pygame
 from constants import (
-    WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE, CAR_WIDTH, CAR_HEIGHT, TILE_KINDS, TILE_COLORS,
+    WINDOW_WIDTH, WINDOW_HEIGHT, TILE_SIZE, CAR_WIDTH, CAR_HEIGHT,
     COLOR_BG, COLOR_TEXT, COLOR_ACCENT, COLOR_PANEL, COLOR_PANEL_BORDER,
-    GameState, CIRCUIT_LAYOUTS
+    GameState
 )
 from model.game_model import GameModel
 from model.road_tile import RoadTile
+from terrains import TILE_KINDS, TILE_COLORS, CIRCUIT_LAYOUTS, BLOCK_COLORS
+
 
 
 class GameView:
@@ -60,7 +62,7 @@ class GameView:
         self.screen.blit(text, text.get_rect(center=rect.center))
 
     def _draw_menu(self) -> None:
-        self._draw_title("Jeu de course 2D", 160)
+        self._draw_title("Course de voitures", 160)
         self._draw_button(320, "JOUER (Enter)", selected=True)
         self._draw_button(400, "QUITTER (Escape)", selected=False)
 
@@ -70,10 +72,13 @@ class GameView:
             self._draw_button(280 + i * 80, layout["name"], selected=(i == model.selected_index))
 
     def _draw_tile(self, tile: RoadTile) -> None:
-        color = TILE_COLORS.get(tile.kind, (255, 0, 255))  # magenta = type inconnu
+        color = TILE_COLORS.get(tile.kind, (255, 0, 255))  
         rect = pygame.Rect(tile.col * TILE_SIZE, tile.row * TILE_SIZE, TILE_SIZE, TILE_SIZE)
         pygame.draw.rect(self.screen, color, rect)
         pygame.draw.rect(self.screen, (60, 60, 70), rect, 1)
+        if tile.block is not None:
+            inner = rect.inflate(-TILE_SIZE // 2, -TILE_SIZE // 2)
+            pygame.draw.rect(self.screen, BLOCK_COLORS.get(tile.block, (255, 0, 255)), inner)
 
     def _draw_racing(self, model: GameModel) -> None:
         if model.circuit is None or model.car is None:

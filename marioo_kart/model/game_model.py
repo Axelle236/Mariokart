@@ -1,6 +1,7 @@
-from constants import GameState, GRID_ROWS, GRID_COLS, CIRCUIT_LAYOUTS
+from constants import GameState, GRID_ROWS
 from model.car import Car
 from model.circuit import Circuit
+from terrains import CIRCUIT_LAYOUTS, TILE_KINDS, TILE_COLORS
 
 
 class GameModel:
@@ -19,10 +20,10 @@ class GameModel:
 
     def load_circuit(self, index: int) -> None:
         layout=CIRCUIT_LAYOUTS[index]
-        self.circuit = Circuit(layout["name"], layout["terrain"])
+        self.circuit = Circuit(layout["name"], layout["terrain"], layout["blocks"])
         self.spawn_car()
 
-    def circuit_selection(self) -> list[str]:
+    def circuit_name(self) -> list[str]:
         return[layout["name"] for layout in CIRCUIT_LAYOUTS]
 
     def select_next_circuit(self) -> None:
