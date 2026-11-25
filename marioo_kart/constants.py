@@ -57,6 +57,9 @@ TERRAIN_DRIFT_FRICTION = {
     "ice": 0.002
 }
 
+CAR_BOOST_SPEED = 3.0
+CAR_MAX_BOOST_SPEED = 9.0
+
 # --- États du jeu ---
 class GameState:
     MENU = "menu"

@@ -17,7 +17,9 @@ from constants import (
     TERRAIN_FRICTION,
     AIR_FRICTION,
     DRIFT_ANGLE_THRESHOLD,
-    TERRAIN_DRIFT_FRICTION
+    TERRAIN_DRIFT_FRICTION,
+    CAR_BOOST_SPEED,
+    CAR_MAX_BOOST_SPEED
 )
 GRIP_SCALE = 0.87
 
@@ -51,10 +53,15 @@ class Car:
         self.color = color
 
     def accelerate(self) -> None:
-        self.speed = min(
-        self.speed + CAR_ACCELERATION * self.traction,
-        CAR_MAX_SPEED
-    )
+        """
+        Accélère la voiture jusqu'à sa vitesse maximale
+        normale sans annuler l'effet d'un boost.
+        """
+        if self.speed < CAR_MAX_SPEED:
+            self.speed = min(
+                self.speed + CAR_ACCELERATION * self.traction,
+                CAR_MAX_SPEED
+            )
 
     def brake(self) -> None:
         """
@@ -196,3 +203,33 @@ class Car:
             self.y = height - margin
             self.vy = 0.0
             self.speed = 0.0
+
+    def reset_position(
+        self,
+        x: float,
+        y: float,
+        angle: float
+    ) -> None:
+        """
+        Réinitialise la position et l'orientation
+        de la voiture en annulant sa vitesse.
+        """
+        self.x = x
+        self.y = y
+        self.angle = angle
+
+        self.speed = 0.0
+        self.vx = 0.0
+        self.vy = 0.0
+
+    def apply_boost(self) -> None:
+        """
+        Augmente la vitesse de la voiture
+        sans dépasser la vitesse maximale du boost.
+        """
+
+        if self.speed >= 0:
+            self.speed = min(
+                self.speed + CAR_BOOST_SPEED,
+                CAR_MAX_BOOST_SPEED
+        )
